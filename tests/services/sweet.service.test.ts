@@ -118,4 +118,94 @@ describe("SweetService", () => {
       expect(() => service.deleteSweet(-1)).toThrow();
     });
   });
+
+  describe("search", () => {
+    beforeEach(() => {
+      const sweet1 = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
+      const sweet2 = new Sweet(2, "Milk Chocolate", "chocolate", 3.0, 15);
+      const sweet3 = new Sweet(3, "Gummy Bears", "candy", 1.5, 20);
+      const sweet4 = new Sweet(4, "Sour Gummies", "candy", 2.0, 12);
+      const sweet5 = new Sweet(5, "Croissant", "pastry", 4.5, 5);
+
+      service.createSweet(sweet1);
+      service.createSweet(sweet2);
+      service.createSweet(sweet3);
+      service.createSweet(sweet4);
+      service.createSweet(sweet5);
+    });
+
+    describe("search functionality", () => {
+      it("should return sweets matching search criteria", () => {
+        const results = service.searchSweets({ name: "chocolate" });
+        expect(results).toHaveLength(2);
+        expect(results.map((s) => s.id)).toContain(1);
+        expect(results.map((s) => s.id)).toContain(2);
+      });
+
+      it("should return sweets matching category", () => {
+        const results = service.searchSweets({ category: "candy" });
+        expect(results).toHaveLength(2);
+        expect(results.map((s) => s.id)).toContain(3);
+        expect(results.map((s) => s.id)).toContain(4);
+      });
+
+      it("should return sweets within price range", () => {
+        const results = service.searchSweets({ minPrice: 2.0, maxPrice: 3.0 });
+        expect(results).toHaveLength(3);
+        expect(results.map((s) => s.id)).toContain(1);
+        expect(results.map((s) => s.id)).toContain(2);
+        expect(results.map((s) => s.id)).toContain(4);
+      });
+
+      it("should return empty array when no matches found", () => {
+        const results = service.searchSweets({ name: "Nonexistent" });
+        expect(results).toEqual([]);
+      });
+    });
+
+    describe("business logic validation", () => {
+      it("should throw error when search criteria is empty", () => {
+        expect(() => service.searchSweets({})).toThrow();
+      });
+
+      it("should throw error when search criteria is null or undefined", () => {
+        expect(() => service.searchSweets(null as unknown as object)).toThrow();
+        expect(() =>
+          service.searchSweets(undefined as unknown as object),
+        ).toThrow();
+      });
+
+      it("should throw error when price range is invalid", () => {
+        expect(() =>
+          service.searchSweets({ minPrice: 5.0, maxPrice: 2.0 }),
+        ).toThrow();
+      });
+
+      it("should throw error when prices are negative", () => {
+        expect(() => service.searchSweets({ minPrice: -1.0 })).toThrow();
+        expect(() => service.searchSweets({ maxPrice: -1.0 })).toThrow();
+      });
+
+      it("should handle search with multiple criteria", () => {
+        const results = service.searchSweets({
+          category: "candy",
+          minPrice: 1.8,
+        });
+        expect(results).toHaveLength(1);
+        expect(results[0].id).toBe(4);
+      });
+
+      it("should trim and normalize search inputs", () => {
+        const results = service.searchSweets({ name: "  CHOCOLATE  " });
+        expect(results).toHaveLength(2);
+        expect(results.map((s) => s.id)).toContain(1);
+        expect(results.map((s) => s.id)).toContain(2);
+      });
+
+      it("should have at least one valid search criteria", () => {
+        expect(() => service.searchSweets({ name: "" })).toThrow();
+        expect(() => service.searchSweets({ category: "" })).toThrow();
+      });
+    });
+  });
 });

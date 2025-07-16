@@ -121,4 +121,122 @@ describe("SweetRepository", () => {
       expect(allSweets).not.toContain(sweet2);
     });
   });
+
+  describe("search", () => {
+    beforeEach(() => {
+      const sweet1 = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
+      const sweet2 = new Sweet(2, "Milk Chocolate", "chocolate", 3.0, 15);
+      const sweet3 = new Sweet(3, "Gummy Bears", "candy", 1.5, 20);
+      const sweet4 = new Sweet(4, "Sour Gummies", "candy", 2.0, 12);
+      const sweet5 = new Sweet(5, "Croissant", "pastry", 4.5, 5);
+      const sweet6 = new Sweet(6, "Danish Pastry", "pastry", 3.5, 8);
+
+      repository.create(sweet1);
+      repository.create(sweet2);
+      repository.create(sweet3);
+      repository.create(sweet4);
+      repository.create(sweet5);
+      repository.create(sweet6);
+    });
+
+    describe("search by name", () => {
+      it("should return sweets matching partial name - case insensitive", () => {
+        const results = repository.search({ name: "chocolate" });
+        expect(results).toHaveLength(2);
+        expect(results.map((s) => s.id)).toContain(1);
+        expect(results.map((s) => s.id)).toContain(2);
+      });
+
+      it("should return sweets matching exact name", () => {
+        const results = repository.search({ name: "Gummy Bears" });
+        expect(results).toHaveLength(1);
+        expect(results.map((s) => s.id)).toContain(3);
+      });
+
+      it("should return empty array when no name matches", () => {
+        const results = repository.search({ name: "Nonexistent" });
+        expect(results).toEqual([]);
+      });
+    });
+
+    describe("search by category", () => {
+      it("should return all sweets in a category", () => {
+        const results = repository.search({ category: "candy" });
+        expect(results).toHaveLength(2);
+        expect(results.map((s) => s.id)).toContain(3);
+        expect(results.map((s) => s.id)).toContain(4);
+      });
+
+      it("should return empty array when category doesn't exist", () => {
+        const results = repository.search({ category: "ice-cream" });
+        expect(results).toEqual([]);
+      });
+    });
+
+    describe("search by price range", () => {
+      it("should return sweets within price range", () => {
+        const results = repository.search({ minPrice: 2.0, maxPrice: 3.0 });
+        expect(results).toHaveLength(3);
+        expect(results.map((s) => s.id)).toContain(1);
+        expect(results.map((s) => s.id)).toContain(2);
+        expect(results.map((s) => s.id)).toContain(4);
+      });
+
+      it("should return sweets with minimum price only", () => {
+        const results = repository.search({ minPrice: 3.0 });
+        expect(results).toHaveLength(3);
+        expect(results.map((s) => s.id)).toContain(5);
+        expect(results.map((s) => s.id)).toContain(6);
+        expect(results.map((s) => s.id)).toContain(2);
+      });
+
+      it("should return sweets with maximum price only", () => {
+        const results = repository.search({ maxPrice: 2.0 });
+        expect(results).toHaveLength(2);
+        expect(results.map((s) => s.id)).toContain(3);
+        expect(results.map((s) => s.id)).toContain(4);
+      });
+
+      it("should return empty array when no sweets match price range", () => {
+        const results = repository.search({ minPrice: 10.0, maxPrice: 15.0 });
+        expect(results).toEqual([]);
+      });
+    });
+
+    describe("search with multiple criteria", () => {
+      it("should return sweets matching both name and category", () => {
+        const results = repository.search({
+          name: "chocolate",
+          category: "chocolate",
+        });
+        expect(results).toHaveLength(2);
+        expect(results.map((s) => s.id)).toContain(1);
+        expect(results.map((s) => s.id)).toContain(2);
+      });
+
+      it("should return sweets matching category and price range", () => {
+        const results = repository.search({
+          category: "candy",
+          minPrice: 1.8,
+          maxPrice: 2.5,
+        });
+        expect(results).toHaveLength(1);
+        expect(results.map((s) => s.id)).toContain(4);
+      });
+
+      it("should return sweets matching name and price range", () => {
+        const results = repository.search({ name: "chocolate", minPrice: 2.8 });
+        expect(results).toHaveLength(1);
+        expect(results.map((s) => s.id)).toContain(2);
+      });
+
+      it("should return empty array when no sweets match all criteria", () => {
+        const results = repository.search({
+          name: "chocolate",
+          category: "candy",
+        });
+        expect(results).toEqual([]);
+      });
+    });
+  });
 });
