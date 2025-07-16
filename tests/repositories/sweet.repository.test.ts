@@ -29,6 +29,31 @@ describe("SweetRepository", () => {
     });
   });
 
+  describe("getById", () => {
+    it("should return undefined when sweet don't exist", () => {
+      const sweet = repository.getById(1);
+      expect(sweet).toBeUndefined();
+    });
+
+    it("should return the sweet when it exists", () => {
+      const sweet = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
+      const sweet2 = new Sweet(2, "Gummy Bears", "candy", 1.5, 20);
+      const sweet3 = new Sweet(3, "Croissant", "pastry", 3.0, 5);
+      repository.create(sweet);
+      repository.create(sweet2);
+      repository.create(sweet3);
+
+      const foundSweet1 = repository.getById(1);
+      expect(foundSweet1).toEqual(sweet);
+
+      const foundSweet2 = repository.getById(2);
+      expect(foundSweet2).toEqual(sweet2);
+
+      const foundSweet3 = repository.getById(3);
+      expect(foundSweet3).toEqual(sweet3);
+    });
+  });
+
   describe("create", () => {
     it("should add multiple sweets to the repository", () => {
       const sweet1 = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
