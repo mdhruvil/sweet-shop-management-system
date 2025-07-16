@@ -5,6 +5,7 @@ import type { Sweet } from "../models/sweet.model.js";
 export interface ISweetRepository {
   create(sweet: Sweet): Sweet;
   getAll(): Sweet[];
+  getById(id: number): Sweet | undefined;
 }
 
 export class InMemorySweetRepository implements ISweetRepository {
@@ -13,6 +14,7 @@ export class InMemorySweetRepository implements ISweetRepository {
   constructor() {
     this.sweets = [];
   }
+
   create(sweet: Sweet): Sweet {
     if (!sweet) {
       throw new Error("Sweet cannot be null or undefined");
@@ -25,7 +27,12 @@ export class InMemorySweetRepository implements ISweetRepository {
     this.sweets.push(sweet);
     return sweet;
   }
+
   getAll(): Sweet[] {
     return this.sweets;
+  }
+
+  getById(id: number): Sweet | undefined {
+    return this.sweets.find((sweet) => sweet.id === id);
   }
 }
