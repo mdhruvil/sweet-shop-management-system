@@ -84,4 +84,41 @@ describe("SweetRepository", () => {
       expect(result).toBe(sweet);
     });
   });
+
+  describe("delete", () => {
+    it("should return false when trying to delete non-existent sweet", () => {
+      const result = repository.delete(999);
+      expect(result).toBe(false);
+    });
+
+    it("should delete existing sweet and return true", () => {
+      const sweet = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
+      repository.create(sweet);
+
+      const result = repository.delete(1);
+      expect(result).toBe(true);
+
+      const foundSweet = repository.getById(1);
+      expect(foundSweet).toBeUndefined();
+    });
+
+    it("should only delete the specified sweet", () => {
+      const sweet1 = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
+      const sweet2 = new Sweet(2, "Gummy Bears", "candy", 1.5, 20);
+      const sweet3 = new Sweet(3, "Croissant", "pastry", 3.0, 5);
+
+      repository.create(sweet1);
+      repository.create(sweet2);
+      repository.create(sweet3);
+
+      const result = repository.delete(2);
+      expect(result).toBe(true);
+
+      const allSweets = repository.getAll();
+      expect(allSweets).toHaveLength(2);
+      expect(allSweets).toContain(sweet1);
+      expect(allSweets).toContain(sweet3);
+      expect(allSweets).not.toContain(sweet2);
+    });
+  });
 });

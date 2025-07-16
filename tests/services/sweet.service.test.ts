@@ -72,4 +72,50 @@ describe("SweetService", () => {
       expect(result).toBe(sweet);
     });
   });
+
+  describe("delete", () => {
+    it("should return false when trying to delete non-existent sweet", () => {
+      const result = service.deleteSweet(999);
+      expect(result).toBe(false);
+    });
+
+    it("should delete existing sweet and return true", () => {
+      const sweet = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
+      service.createSweet(sweet);
+
+      const result = service.deleteSweet(1);
+      expect(result).toBe(true);
+
+      const allSweets = service.getAllSweets();
+      expect(allSweets).not.toContain(sweet);
+      expect(allSweets).toHaveLength(0);
+    });
+
+    it("should only delete the specified sweet", () => {
+      const sweet1 = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
+      const sweet2 = new Sweet(2, "Gummy Bears", "candy", 1.5, 20);
+      const sweet3 = new Sweet(3, "Croissant", "pastry", 3.0, 5);
+
+      service.createSweet(sweet1);
+      service.createSweet(sweet2);
+      service.createSweet(sweet3);
+
+      const result = service.deleteSweet(2);
+      expect(result).toBe(true);
+
+      const allSweets = service.getAllSweets();
+      expect(allSweets).toHaveLength(2);
+      expect(allSweets).toContain(sweet1);
+      expect(allSweets).toContain(sweet3);
+      expect(allSweets).not.toContain(sweet2);
+    });
+
+    it("should throw error when trying to delete with invalid ID", () => {
+      expect(() => service.deleteSweet(null as unknown as number)).toThrow();
+      expect(() =>
+        service.deleteSweet(undefined as unknown as number),
+      ).toThrow();
+      expect(() => service.deleteSweet(-1)).toThrow();
+    });
+  });
 });
