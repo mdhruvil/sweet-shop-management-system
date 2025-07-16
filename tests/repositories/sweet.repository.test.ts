@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Sweet } from "../../src/models/sweet.model.js";
-import { SweetRepository } from "../../src/repositories/sweet.repository.js";
+import { InMemorySweetRepository } from "../../src/repositories/sweet.repository.js";
 
 describe("SweetRepository", () => {
-  let repository: SweetRepository;
+  let repository: InMemorySweetRepository;
 
   beforeEach(() => {
-    repository = new SweetRepository();
+    repository = new InMemorySweetRepository();
   });
 
   describe("getAll", () => {

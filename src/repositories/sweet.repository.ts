@@ -1,6 +1,13 @@
 import type { Sweet } from "../models/sweet.model.js";
 
-export class SweetRepository {
+// central interface for sweet repository
+// this allows for different implementations (e.g., in-memory, database, etc.)
+interface ISweetRepository {
+  create(sweet: Sweet): Sweet;
+  getAll(): Sweet[];
+}
+
+export class InMemorySweetRepository implements ISweetRepository {
   private sweets: Sweet[];
 
   constructor() {
