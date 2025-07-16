@@ -23,6 +23,6 @@
     // vitest globals to make it like jest
     "types": ["vitest/globals"]
   },
-  "include": ["src/**/*", "*.ts", "tests/sum.test.ts"],
+  "include": ["src/**/*", "*.ts", "tests/**/*.test.ts"],
   "exclude": ["node_modules", "dist", "**/*.config.js", "**/*.config.ts"]
 }
