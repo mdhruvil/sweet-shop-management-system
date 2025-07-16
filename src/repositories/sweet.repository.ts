@@ -9,6 +9,10 @@ export interface ISweetRepository {
   getById(id: number): Sweet | undefined;
   delete(id: number): boolean;
   search(criteria: SearchCriteria): Sweet[];
+
+  update(sweet: Sweet): boolean;
+  purchase(id: number, quantity: number): boolean;
+  restock(id: number, quantity: number): boolean;
 }
 
 export class InMemorySweetRepository implements ISweetRepository {
@@ -67,5 +71,35 @@ export class InMemorySweetRepository implements ISweetRepository {
 
       return matchesName && matchesCategory && matchesPrice;
     });
+  }
+
+  update(sweet: Sweet): boolean {
+    const index = this.sweets.findIndex((s) => s.id === sweet.id);
+    if (index === -1) {
+      return false; // Sweet not found
+    }
+
+    this.sweets[index] = sweet;
+    return true;
+  }
+
+  purchase(id: number, quantity: number): boolean {
+    const sweet = this.getById(id);
+
+    if (!sweet?.canPurchase(quantity)) {
+      return false; // Not enough stock or sweet not found
+    }
+
+    sweet.purchase(quantity);
+    return this.update(sweet);
+  }
+
+  restock(id: number, quantity: number): boolean {
+    const sweet = this.getById(id);
+    if (!sweet) {
+      return false;
+    }
+    sweet.restock(quantity);
+    return this.update(sweet);
   }
 }

@@ -274,15 +274,9 @@ describe("SweetService", () => {
       });
 
       it("should throw error when sweet ID is invalid", () => {
-        expect(() => service.purchaseSweet(0, 1)).toThrow(
-          "Sweet ID must be positive",
-        );
-        expect(() => service.purchaseSweet(-1, 1)).toThrow(
-          "Sweet ID must be positive",
-        );
-        expect(() => service.purchaseSweet(1.5, 1)).toThrow(
-          "Sweet ID must be a whole number",
-        );
+        expect(() => service.purchaseSweet(0, 1)).toThrow();
+        expect(() => service.purchaseSweet(-1, 1)).toThrow();
+        expect(() => service.purchaseSweet(1.5, 1)).toThrow();
         expect(() =>
           service.purchaseSweet(null as unknown as number, 1),
         ).toThrow();

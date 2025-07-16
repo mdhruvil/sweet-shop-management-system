@@ -9,6 +9,13 @@ export class SweetService {
     return this.repository.getAll();
   }
 
+  getSweetById(id: number): Sweet | undefined {
+    if (typeof id !== "number" || !Number.isInteger(id) || id <= 0) {
+      throw new Error("Invalid ID: ID must be a positive integer");
+    }
+    return this.repository.getById(id);
+  }
+
   createSweet(sweet: Sweet): Sweet {
     if (!sweet) {
       throw new Error("Sweet cannot be null or undefined");
@@ -90,5 +97,42 @@ export class SweetService {
     };
 
     return this.repository.search(normalizedCriteria);
+  }
+
+  purchaseSweet(id: number, quantity: number): boolean {
+    if (typeof id !== "number" || !Number.isInteger(id) || id <= 0) {
+      throw new Error("Invalid ID: ID must be a positive integer");
+    }
+    if (
+      typeof quantity !== "number" ||
+      !Number.isInteger(quantity) ||
+      quantity <= 0
+    ) {
+      throw new Error("Invalid quantity: Quantity must be a positive integer");
+    }
+    const result = this.repository.purchase(id, quantity);
+    if (!result) {
+      throw new Error("Purchase failed: Not enough stock or sweet not found");
+    }
+    return result;
+  }
+
+  restockSweet(id: number, quantity: number): boolean {
+    if (typeof id !== "number" || !Number.isInteger(id) || id <= 0) {
+      throw new Error("Invalid ID: ID must be a positive integer");
+    }
+    if (
+      typeof quantity !== "number" ||
+      !Number.isInteger(quantity) ||
+      quantity <= 0
+    ) {
+      throw new Error("Invalid quantity: Quantity must be a positive integer");
+    }
+
+    const result = this.repository.restock(id, quantity);
+    if (!result) {
+      throw new Error("Restock failed: Sweet not found or invalid quantity");
+    }
+    return result;
   }
 }
