@@ -1,3 +1,7 @@
+import { prettifyError } from "zod";
+import { sweetSchema } from "../schema/sweet.schema.js";
+import { positiveIntegerSchema } from "../schema/common.js";
+
 export class Sweet {
   constructor(
     public id: number,
@@ -6,41 +10,44 @@ export class Sweet {
     public price: number,
     public quantity: number,
   ) {
-    if (id <= 0 || !Number.isInteger(id)) {
-      throw new Error("ID must be a positive number");
-    }
+    const { success, error } = sweetSchema.safeParse({
+      id,
+      name,
+      category,
+      price,
+      quantity,
+    });
+    if (!success) {
+      const prettyError = prettifyError(error);
 
-    if (typeof name !== "string" || name.trim() === "") {
-      throw new Error("Name cannot be empty");
-    }
-
-    if (typeof price !== "number" || price < 0) {
-      throw new Error("Price must be a non-negative number");
-    }
-
-    if (
-      typeof quantity !== "number" ||
-      quantity < 0 ||
-      !Number.isInteger(quantity)
-    ) {
-      throw new Error("Quantity must be a non-negative integer");
+      throw new Error(prettyError);
     }
   }
 
   canPurchase(amount: number): boolean {
-    return this.quantity >= amount && amount > 0;
+    const { success } = positiveIntegerSchema.safeParse(amount);
+    return success && this.quantity >= amount;
   }
 
   purchase(amount: number): void {
+    const { success, error } = positiveIntegerSchema.safeParse(amount);
+    if (!success) {
+      const prettyError = prettifyError(error);
+
+      throw new Error(prettyError);
+    }
     if (!this.canPurchase(amount)) {
-      throw new Error("Insufficient quantity or invalid amount");
+      throw new Error("Insufficient quantity");
     }
     this.quantity -= amount;
   }
 
   restock(amount: number): void {
-    if (amount <= 0) {
-      throw new Error("Restock amount must be positive");
+    const { success, error } = positiveIntegerSchema.safeParse(amount);
+    if (!success) {
+      const prettyError = prettifyError(error);
+
+      throw new Error(prettyError);
     }
     this.quantity += amount;
   }
