@@ -181,6 +181,11 @@ describe("Sweet Model", () => {
       expect(sweet.quantity).toBe(7);
     });
 
+    it("should throw error when purchasing more than available stock", () => {
+      const sweet = new Sweet(1, "Chocolate Bar", "chocolate", 2.99, 10);
+      expect(() => sweet.purchase(15)).toThrow();
+    });
+
     it("should handle purchasing all remaining stock", () => {
       const sweet = new Sweet(2, "Final Stock", "pastry", 4.0, 5);
 
@@ -214,6 +219,12 @@ describe("Sweet Model", () => {
 
       expect(sweet.quantity).toBe(originalQuantity + 10);
       expect(sweet.quantity).toBe(15);
+    });
+
+    it("should throw error when restocking with non-positive amount", () => {
+      const sweet = new Sweet(2, "Invalid Restock", "candy", 1.0, 10);
+      expect(() => sweet.restock(-5)).toThrow();
+      expect(() => sweet.restock(0)).toThrow();
     });
 
     it("should maintain other properties unchanged after restock", () => {
