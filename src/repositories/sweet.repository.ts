@@ -2,7 +2,7 @@ import type { Sweet } from "../models/sweet.model.js";
 
 // central interface for sweet repository
 // this allows for different implementations (e.g., in-memory, database, etc.)
-interface ISweetRepository {
+export interface ISweetRepository {
   create(sweet: Sweet): Sweet;
   getAll(): Sweet[];
 }
