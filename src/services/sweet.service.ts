@@ -20,4 +20,11 @@ export class SweetService {
 
     return this.repository.create(sweet);
   }
+
+  deleteSweet(id: number): boolean {
+    if (typeof id !== "number" || !Number.isInteger(id) || id <= 0) {
+      throw new Error("Invalid ID: ID must be a positive integer");
+    }
+    return this.repository.delete(id);
+  }
 }

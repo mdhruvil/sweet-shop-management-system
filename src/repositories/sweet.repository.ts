@@ -6,6 +6,7 @@ export interface ISweetRepository {
   create(sweet: Sweet): Sweet;
   getAll(): Sweet[];
   getById(id: number): Sweet | undefined;
+  delete(id: number): boolean;
 }
 
 export class InMemorySweetRepository implements ISweetRepository {
@@ -30,5 +31,15 @@ export class InMemorySweetRepository implements ISweetRepository {
 
   getById(id: number): Sweet | undefined {
     return this.sweets.find((sweet) => sweet.id === id);
+  }
+
+  delete(id: number): boolean {
+    const index = this.sweets.findIndex((sweet) => sweet.id === id);
+    if (index === -1) {
+      return false; // Sweet not found
+    }
+
+    this.sweets.splice(index, 1);
+    return true;
   }
 }
