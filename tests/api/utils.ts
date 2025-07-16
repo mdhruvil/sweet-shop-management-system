@@ -1,7 +1,7 @@
 import request from "supertest";
 import { expect } from "vitest";
+import { app } from "../../src/index.js";
 import { Sweet } from "../../src/models/sweet.model.js";
-import type { SweetService } from "../../src/services/sweet.service.js";
 
 export const createTestSweet = (overrides: Partial<Sweet> = {}): Sweet => {
   return new Sweet(
@@ -13,7 +13,7 @@ export const createTestSweet = (overrides: Partial<Sweet> = {}): Sweet => {
   );
 };
 
-export const setupTestData = (service: SweetService) => {
+export const setupTestData = async () => {
   const sweets = [
     createTestSweet({
       id: 1,
@@ -45,8 +45,31 @@ export const setupTestData = (service: SweetService) => {
     }),
   ];
 
-  sweets.forEach((sweet) => service.createSweet(sweet));
-  return sweets;
+  const createdSweets = [];
+
+  for (const sweet of sweets) {
+    const res = await request(app)
+      .post("/api/sweets")
+      .send({
+        name: sweet.name,
+        category: sweet.category,
+        price: sweet.price,
+        quantity: sweet.quantity,
+      })
+      .expect(201);
+    expectValidSweet(res.body.data);
+    createdSweets.push(
+      new Sweet(
+        res.body.data.id,
+        res.body.data.name,
+        res.body.data.category,
+        res.body.data.price,
+        res.body.data.quantity,
+      ),
+    );
+  }
+
+  return createdSweets;
 };
 
 export const expectValidSweet = (sweet: Sweet) => {
