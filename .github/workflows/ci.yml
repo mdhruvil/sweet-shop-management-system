@@ -1,4 +1,5 @@
-name: test the code
+name: Typecheck and run tests
+description: This workflow checks the code for type errors and runs tests to ensure code quality.
 on:
   push:
 
@@ -19,5 +20,7 @@ jobs:
           cache: "pnpm"
       - name: Install dependencies
         run: pnpm install
+      - name: typecheck
+        run: pnpm typecheck
       - name: Run tests
         run: pnpm test:coverage
