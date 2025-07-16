@@ -216,166 +216,166 @@ describe("SweetService", () => {
         expect(() => service.searchSweets({ category: "" })).toThrow();
       });
     });
+  });
 
-    describe("Inventory Management", () => {
-      describe("Purchase Sweets", () => {
-        beforeEach(() => {
-          const sweet1 = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
-          const sweet2 = new Sweet(2, "Gummy Bears", "candy", 1.5, 20);
-          const sweet3 = new Sweet(3, "Croissant", "pastry", 4.5, 0);
+  describe("Inventory Management", () => {
+    describe("Purchase Sweets", () => {
+      beforeEach(() => {
+        const sweet1 = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
+        const sweet2 = new Sweet(2, "Gummy Bears", "candy", 1.5, 20);
+        const sweet3 = new Sweet(3, "Croissant", "pastry", 4.5, 0);
 
-          service.createSweet(sweet1);
-          service.createSweet(sweet2);
-          service.createSweet(sweet3);
-        });
-
-        it("should successfully purchase sweet when sufficient stock is available", () => {
-          const result = service.purchaseSweet(1, 3);
-
-          expect(result).toBe(true);
-          const sweet = service.getSweetById(1);
-          expect(sweet?.quantity).toBe(7);
-        });
-
-        it("should purchase exact remaining stock", () => {
-          const result = service.purchaseSweet(1, 10);
-
-          expect(result).toBe(true);
-          const sweet = service.getSweetById(1);
-          expect(sweet?.quantity).toBe(0);
-        });
-
-        it("should throw error when purchasing more than available stock", () => {
-          expect(() => service.purchaseSweet(1, 15)).toThrow();
-        });
-
-        it("should throw error when purchasing from out-of-stock sweet", () => {
-          expect(() => service.purchaseSweet(3, 1)).toThrow();
-        });
-
-        it("should throw error when sweet does not exist", () => {
-          expect(() => service.purchaseSweet(999, 1)).toThrow();
-        });
-
-        it("should throw error when purchase quantity is invalid", () => {
-          expect(() => service.purchaseSweet(1, 0)).toThrow();
-          expect(() => service.purchaseSweet(1, -1)).toThrow();
-          expect(() => service.purchaseSweet(1, 1.5)).toThrow();
-          expect(() =>
-            service.purchaseSweet(1, null as unknown as number),
-          ).toThrow();
-          expect(() =>
-            service.purchaseSweet(1, undefined as unknown as number),
-          ).toThrow();
-          expect(() =>
-            service.purchaseSweet(1, "5" as unknown as number),
-          ).toThrow();
-        });
-
-        it("should throw error when sweet ID is invalid", () => {
-          expect(() => service.purchaseSweet(0, 1)).toThrow(
-            "Sweet ID must be positive",
-          );
-          expect(() => service.purchaseSweet(-1, 1)).toThrow(
-            "Sweet ID must be positive",
-          );
-          expect(() => service.purchaseSweet(1.5, 1)).toThrow(
-            "Sweet ID must be a whole number",
-          );
-          expect(() =>
-            service.purchaseSweet(null as unknown as number, 1),
-          ).toThrow();
-          expect(() =>
-            service.purchaseSweet(undefined as unknown as number, 1),
-          ).toThrow();
-        });
-
-        it("should maintain other sweet properties unchanged after purchase", () => {
-          const originalSweet = service.getSweetById(1);
-          const originalName = originalSweet?.name;
-          const originalCategory = originalSweet?.category;
-          const originalPrice = originalSweet?.price;
-
-          service.purchaseSweet(1, 5);
-
-          const sweet = service.getSweetById(1);
-          expect(sweet?.name).toBe(originalName);
-          expect(sweet?.category).toBe(originalCategory);
-          expect(sweet?.price).toBe(originalPrice);
-        });
+        service.createSweet(sweet1);
+        service.createSweet(sweet2);
+        service.createSweet(sweet3);
       });
 
-      describe("Restock Sweets", () => {
-        beforeEach(() => {
-          const sweet1 = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
-          const sweet2 = new Sweet(2, "Gummy Bears", "candy", 1.5, 0);
-          const sweet3 = new Sweet(3, "Croissant", "pastry", 4.5, 5);
+      it("should successfully purchase sweet when sufficient stock is available", () => {
+        const result = service.purchaseSweet(1, 3);
 
-          service.createSweet(sweet1);
-          service.createSweet(sweet2);
-          service.createSweet(sweet3);
-        });
+        expect(result).toBe(true);
+        const sweet = service.getSweetById(1);
+        expect(sweet?.quantity).toBe(7);
+      });
 
-        it("should successfully restock sweet with valid quantity", () => {
-          const result = service.restockSweet(1, 15);
+      it("should purchase exact remaining stock", () => {
+        const result = service.purchaseSweet(1, 10);
 
-          expect(result).toBe(true);
-          const sweet = service.getSweetById(1);
-          expect(sweet?.quantity).toBe(25);
-        });
+        expect(result).toBe(true);
+        const sweet = service.getSweetById(1);
+        expect(sweet?.quantity).toBe(0);
+      });
 
-        it("should restock out-of-stock sweet", () => {
-          const result = service.restockSweet(2, 10);
+      it("should throw error when purchasing more than available stock", () => {
+        expect(() => service.purchaseSweet(1, 15)).toThrow();
+      });
 
-          expect(result).toBe(true);
-          const sweet = service.getSweetById(2);
-          expect(sweet?.quantity).toBe(10);
-        });
+      it("should throw error when purchasing from out-of-stock sweet", () => {
+        expect(() => service.purchaseSweet(3, 1)).toThrow();
+      });
 
-        it("should throw error when sweet does not exist", () => {
-          expect(() => service.restockSweet(999, 10)).toThrow();
-        });
+      it("should throw error when sweet does not exist", () => {
+        expect(() => service.purchaseSweet(999, 1)).toThrow();
+      });
 
-        it("should throw error when restock quantity is invalid", () => {
-          expect(() => service.restockSweet(1, 0)).toThrow();
-          expect(() => service.restockSweet(1, -1)).toThrow();
-          expect(() => service.restockSweet(1, 1.5)).toThrow();
-          expect(() =>
-            service.restockSweet(1, null as unknown as number),
-          ).toThrow();
-          expect(() =>
-            service.restockSweet(1, undefined as unknown as number),
-          ).toThrow();
-          expect(() =>
-            service.restockSweet(1, "5" as unknown as number),
-          ).toThrow();
-        });
+      it("should throw error when purchase quantity is invalid", () => {
+        expect(() => service.purchaseSweet(1, 0)).toThrow();
+        expect(() => service.purchaseSweet(1, -1)).toThrow();
+        expect(() => service.purchaseSweet(1, 1.5)).toThrow();
+        expect(() =>
+          service.purchaseSweet(1, null as unknown as number),
+        ).toThrow();
+        expect(() =>
+          service.purchaseSweet(1, undefined as unknown as number),
+        ).toThrow();
+        expect(() =>
+          service.purchaseSweet(1, "5" as unknown as number),
+        ).toThrow();
+      });
 
-        it("should throw error when sweet ID is invalid", () => {
-          expect(() => service.restockSweet(0, 10)).toThrow();
-          expect(() => service.restockSweet(-1, 10)).toThrow();
-          expect(() => service.restockSweet(1.5, 10)).toThrow();
-          expect(() =>
-            service.restockSweet(null as unknown as number, 10),
-          ).toThrow();
-          expect(() =>
-            service.restockSweet(undefined as unknown as number, 10),
-          ).toThrow();
-        });
+      it("should throw error when sweet ID is invalid", () => {
+        expect(() => service.purchaseSweet(0, 1)).toThrow(
+          "Sweet ID must be positive",
+        );
+        expect(() => service.purchaseSweet(-1, 1)).toThrow(
+          "Sweet ID must be positive",
+        );
+        expect(() => service.purchaseSweet(1.5, 1)).toThrow(
+          "Sweet ID must be a whole number",
+        );
+        expect(() =>
+          service.purchaseSweet(null as unknown as number, 1),
+        ).toThrow();
+        expect(() =>
+          service.purchaseSweet(undefined as unknown as number, 1),
+        ).toThrow();
+      });
 
-        it("should maintain other sweet properties unchanged after restock", () => {
-          const originalSweet = service.getSweetById(1);
-          const originalName = originalSweet?.name;
-          const originalCategory = originalSweet?.category;
-          const originalPrice = originalSweet?.price;
+      it("should maintain other sweet properties unchanged after purchase", () => {
+        const originalSweet = service.getSweetById(1);
+        const originalName = originalSweet?.name;
+        const originalCategory = originalSweet?.category;
+        const originalPrice = originalSweet?.price;
 
-          service.restockSweet(1, 20);
+        service.purchaseSweet(1, 5);
 
-          const sweet = service.getSweetById(1);
-          expect(sweet?.name).toBe(originalName);
-          expect(sweet?.category).toBe(originalCategory);
-          expect(sweet?.price).toBe(originalPrice);
-        });
+        const sweet = service.getSweetById(1);
+        expect(sweet?.name).toBe(originalName);
+        expect(sweet?.category).toBe(originalCategory);
+        expect(sweet?.price).toBe(originalPrice);
+      });
+    });
+
+    describe("Restock Sweets", () => {
+      beforeEach(() => {
+        const sweet1 = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
+        const sweet2 = new Sweet(2, "Gummy Bears", "candy", 1.5, 0);
+        const sweet3 = new Sweet(3, "Croissant", "pastry", 4.5, 5);
+
+        service.createSweet(sweet1);
+        service.createSweet(sweet2);
+        service.createSweet(sweet3);
+      });
+
+      it("should successfully restock sweet with valid quantity", () => {
+        const result = service.restockSweet(1, 15);
+
+        expect(result).toBe(true);
+        const sweet = service.getSweetById(1);
+        expect(sweet?.quantity).toBe(25);
+      });
+
+      it("should restock out-of-stock sweet", () => {
+        const result = service.restockSweet(2, 10);
+
+        expect(result).toBe(true);
+        const sweet = service.getSweetById(2);
+        expect(sweet?.quantity).toBe(10);
+      });
+
+      it("should throw error when sweet does not exist", () => {
+        expect(() => service.restockSweet(999, 10)).toThrow();
+      });
+
+      it("should throw error when restock quantity is invalid", () => {
+        expect(() => service.restockSweet(1, 0)).toThrow();
+        expect(() => service.restockSweet(1, -1)).toThrow();
+        expect(() => service.restockSweet(1, 1.5)).toThrow();
+        expect(() =>
+          service.restockSweet(1, null as unknown as number),
+        ).toThrow();
+        expect(() =>
+          service.restockSweet(1, undefined as unknown as number),
+        ).toThrow();
+        expect(() =>
+          service.restockSweet(1, "5" as unknown as number),
+        ).toThrow();
+      });
+
+      it("should throw error when sweet ID is invalid", () => {
+        expect(() => service.restockSweet(0, 10)).toThrow();
+        expect(() => service.restockSweet(-1, 10)).toThrow();
+        expect(() => service.restockSweet(1.5, 10)).toThrow();
+        expect(() =>
+          service.restockSweet(null as unknown as number, 10),
+        ).toThrow();
+        expect(() =>
+          service.restockSweet(undefined as unknown as number, 10),
+        ).toThrow();
+      });
+
+      it("should maintain other sweet properties unchanged after restock", () => {
+        const originalSweet = service.getSweetById(1);
+        const originalName = originalSweet?.name;
+        const originalCategory = originalSweet?.category;
+        const originalPrice = originalSweet?.price;
+
+        service.restockSweet(1, 20);
+
+        const sweet = service.getSweetById(1);
+        expect(sweet?.name).toBe(originalName);
+        expect(sweet?.category).toBe(originalCategory);
+        expect(sweet?.price).toBe(originalPrice);
       });
     });
   });
