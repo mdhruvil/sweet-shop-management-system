@@ -1,4 +1,5 @@
 import type { Sweet } from "../models/sweet.model.js";
+import type { SearchCriteria } from "../types/sweet.js";
 
 // central interface for sweet repository
 // this allows for different implementations (e.g., in-memory, database, etc.)
@@ -7,6 +8,7 @@ export interface ISweetRepository {
   getAll(): Sweet[];
   getById(id: number): Sweet | undefined;
   delete(id: number): boolean;
+  search(criteria: SearchCriteria): Sweet[];
 }
 
 export class InMemorySweetRepository implements ISweetRepository {
@@ -41,5 +43,29 @@ export class InMemorySweetRepository implements ISweetRepository {
 
     this.sweets.splice(index, 1);
     return true;
+  }
+
+  search(criteria: SearchCriteria): Sweet[] {
+    const { name, category, minPrice, maxPrice } = criteria;
+    const finalCriteria = {
+      name: name?.trim().toLowerCase(),
+      category: category?.trim().toLowerCase(),
+      minPrice: minPrice ?? 0,
+      maxPrice: maxPrice ?? Number.MAX_SAFE_INTEGER,
+    };
+
+    return this.sweets.filter((sweet) => {
+      const matchesName = finalCriteria.name
+        ? sweet.name.toLowerCase().includes(finalCriteria.name)
+        : true;
+      const matchesCategory = finalCriteria.category
+        ? sweet.category.toLowerCase().includes(finalCriteria.category)
+        : true;
+      const matchesPrice =
+        sweet.price >= finalCriteria.minPrice &&
+        sweet.price <= finalCriteria.maxPrice;
+
+      return matchesName && matchesCategory && matchesPrice;
+    });
   }
 }

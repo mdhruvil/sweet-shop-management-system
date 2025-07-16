@@ -186,13 +186,22 @@ describe("SweetService", () => {
         expect(() => service.searchSweets({ maxPrice: -1.0 })).toThrow();
       });
 
+      it("should throw error when minPrice or maxPrice is not a number", () => {
+        expect(() =>
+          service.searchSweets({ minPrice: "invalid" as unknown as number }),
+        ).toThrow();
+        expect(() =>
+          service.searchSweets({ maxPrice: "invalid" as unknown as number }),
+        ).toThrow();
+      });
+
       it("should handle search with multiple criteria", () => {
         const results = service.searchSweets({
           category: "candy",
           minPrice: 1.8,
         });
         expect(results).toHaveLength(1);
-        expect(results[0].id).toBe(4);
+        expect(results.map((s) => s.id)).toContain(4);
       });
 
       it("should trim and normalize search inputs", () => {
