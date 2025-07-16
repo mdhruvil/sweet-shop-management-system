@@ -239,4 +239,119 @@ describe("SweetRepository", () => {
       });
     });
   });
+
+  describe("Inventory Management", () => {
+    describe("Purchase Operations", () => {
+      beforeEach(() => {
+        const sweet1 = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
+        const sweet2 = new Sweet(2, "Gummy Bears", "candy", 1.5, 20);
+        const sweet3 = new Sweet(3, "Croissant", "pastry", 4.5, 0);
+
+        repository.create(sweet1);
+        repository.create(sweet2);
+        repository.create(sweet3);
+      });
+
+      it("should successfully purchase when sweet exists and has sufficient stock", () => {
+        const result = repository.purchase(1, 3);
+
+        expect(result).toBe(true);
+        const sweet = repository.getById(1);
+        expect(sweet?.quantity).toBe(7);
+      });
+
+      it("should return false when sweet does not exist", () => {
+        const result = repository.purchase(999, 1);
+        expect(result).toBe(false);
+      });
+
+      it("should return false when insufficient stock available", () => {
+        const result = repository.purchase(1, 15);
+        expect(result).toBe(false);
+
+        const sweet = repository.getById(1);
+        expect(sweet?.quantity).toBe(10);
+      });
+
+      it("should maintain other sweet properties unchanged after purchase", () => {
+        const originalSweet = repository.getById(1);
+        const originalName = originalSweet?.name;
+        const originalCategory = originalSweet?.category;
+        const originalPrice = originalSweet?.price;
+
+        repository.purchase(1, 5);
+
+        const sweet = repository.getById(1);
+        expect(sweet?.name).toBe(originalName);
+        expect(sweet?.category).toBe(originalCategory);
+        expect(sweet?.price).toBe(originalPrice);
+      });
+    });
+
+    describe("Restock Operations", () => {
+      beforeEach(() => {
+        const sweet1 = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
+        const sweet2 = new Sweet(2, "Gummy Bears", "candy", 1.5, 0);
+        const sweet3 = new Sweet(3, "Croissant", "pastry", 4.5, 5);
+
+        repository.create(sweet1);
+        repository.create(sweet2);
+        repository.create(sweet3);
+      });
+
+      it("should successfully restock when sweet exists", () => {
+        const result = repository.restock(1, 15);
+
+        expect(result).toBe(true);
+        const sweet = repository.getById(1);
+        expect(sweet?.quantity).toBe(25);
+      });
+
+      it("should return false when sweet does not exist", () => {
+        const result = repository.restock(999, 10);
+        expect(result).toBe(false);
+      });
+
+      it("should maintain other sweet properties unchanged after restock", () => {
+        const originalSweet = repository.getById(1);
+        const originalName = originalSweet?.name;
+        const originalCategory = originalSweet?.category;
+        const originalPrice = originalSweet?.price;
+
+        repository.restock(1, 20);
+
+        const sweet = repository.getById(1);
+        expect(sweet?.name).toBe(originalName);
+        expect(sweet?.category).toBe(originalCategory);
+        expect(sweet?.price).toBe(originalPrice);
+      });
+    });
+
+    describe("Update Operations", () => {
+      beforeEach(() => {
+        const sweet1 = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
+        const sweet2 = new Sweet(2, "Gummy Bears", "candy", 1.5, 20);
+
+        repository.create(sweet1);
+        repository.create(sweet2);
+      });
+
+      it("should successfully update existing sweet", () => {
+        const sweet1 = repository.getById(1)!;
+        expect(sweet1).toBeDefined();
+
+        sweet1.name = "Dark Chocolate Bar";
+        sweet1.price = 3.0;
+        sweet1.quantity = 15;
+
+        const result = repository.update(sweet1);
+
+        expect(result).toBe(true);
+        const sweet = repository.getById(1);
+        expect(sweet?.name).toBe("Dark Chocolate Bar");
+        expect(sweet?.price).toBe(3.0);
+        expect(sweet?.quantity).toBe(15);
+      });
+    });
+  });
 });
