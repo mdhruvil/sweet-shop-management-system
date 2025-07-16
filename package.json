@@ -13,7 +13,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",
