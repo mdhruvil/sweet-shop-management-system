@@ -20,10 +20,6 @@ export class InMemorySweetRepository implements ISweetRepository {
       throw new Error("Sweet cannot be null or undefined");
     }
 
-    if (this.sweets.some((s) => s.id === sweet.id)) {
-      throw new Error(`Sweet with ID ${sweet.id} already exists`);
-    }
-
     this.sweets.push(sweet);
     return sweet;
   }

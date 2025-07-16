@@ -71,15 +71,6 @@ describe("SweetRepository", () => {
       expect(sweets).toContain(sweet3);
     });
 
-    it("should throw error when creating sweet with duplicate ID", () => {
-      const sweet1 = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
-      const sweet2 = new Sweet(1, "Different Sweet", "candy", 1.0, 5);
-
-      repository.create(sweet1);
-
-      expect(() => repository.create(sweet2)).toThrow();
-    });
-
     it("should throw error when creating sweet with null or undefined sweet", () => {
       expect(() => repository.create(null as unknown as Sweet)).toThrow();
       expect(() => repository.create(undefined as unknown as Sweet)).toThrow();
