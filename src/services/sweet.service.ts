@@ -1,9 +1,9 @@
+import { prettifyError } from "zod";
 import type { Sweet } from "../models/sweet.model.js";
 import type { ISweetRepository } from "../repositories/sweet.repository.js";
-import type { SearchCriteria } from "../types/sweet.js";
-import { prettifyError } from "zod";
 import { positiveIntegerSchema } from "../schema/common.js";
 import { searchCriteriaSchema } from "../schema/sweet.schema.js";
+import type { SearchCriteria } from "../types/sweet.js";
 
 export class SweetService {
   constructor(private repository: ISweetRepository) {}

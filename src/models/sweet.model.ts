@@ -1,6 +1,6 @@
 import { prettifyError } from "zod";
-import { sweetSchema } from "../schema/sweet.schema.js";
 import { positiveIntegerSchema } from "../schema/common.js";
+import { sweetSchema } from "../schema/sweet.schema.js";
 
 export class Sweet {
   constructor(

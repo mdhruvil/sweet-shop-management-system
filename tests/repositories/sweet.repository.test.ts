@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { Sweet } from "../../src/models/sweet.model.js";
 import { InMemorySweetRepository } from "../../src/repositories/sweet.repository.js";
 
