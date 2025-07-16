@@ -1,4 +1,6 @@
 import { prettifyError } from "zod";
+import { ValidationError } from "../errors/sweet.errors.js";
+import { logger } from "../lib/logger.js";
 import { positiveIntegerSchema } from "../schema/common.js";
 import { sweetSchema } from "../schema/sweet.schema.js";
 
@@ -19,8 +21,8 @@ export class Sweet {
     });
     if (!success) {
       const prettyError = prettifyError(error);
-
-      throw new Error(prettyError);
+      logger.error(`Invalid sweet data: ${prettyError}`);
+      throw new ValidationError("Invalid sweet data: " + prettyError);
     }
   }
 
@@ -30,24 +32,23 @@ export class Sweet {
   }
 
   purchase(amount: number): void {
-    const { success, error } = positiveIntegerSchema.safeParse(amount);
+    const { success } = positiveIntegerSchema.safeParse(amount);
     if (!success) {
-      const prettyError = prettifyError(error);
-
-      throw new Error(prettyError);
+      logger.error(`Invalid purchase amount: ${amount}`);
+      throw new ValidationError("Purchase amount must be a positive integer.");
     }
     if (!this.canPurchase(amount)) {
-      throw new Error("Insufficient quantity");
+      logger.error(`Insufficient quantity for purchase: ${amount}`);
+      throw new ValidationError("Insufficient quantity");
     }
     this.quantity -= amount;
   }
 
   restock(amount: number): void {
-    const { success, error } = positiveIntegerSchema.safeParse(amount);
+    const { success } = positiveIntegerSchema.safeParse(amount);
     if (!success) {
-      const prettyError = prettifyError(error);
-
-      throw new Error(prettyError);
+      logger.error(`Invalid restock amount: ${amount}`);
+      throw new ValidationError("Restock amount must be a positive integer.");
     }
     this.quantity += amount;
   }

@@ -1,4 +1,6 @@
 import { prettifyError } from "zod";
+import { ValidationError } from "../errors/sweet.errors.js";
+import { logger } from "../lib/logger.js";
 import type { Sweet } from "../models/sweet.model.js";
 import type { ISweetRepository } from "../repositories/sweet.repository.js";
 import { positiveIntegerSchema } from "../schema/common.js";
@@ -16,19 +18,22 @@ export class SweetService {
     const { success, error } = positiveIntegerSchema.safeParse(id);
     if (!success) {
       const prettyError = prettifyError(error);
-
-      throw new Error(prettyError);
+      logger.error(`Invalid sweet ID: ${prettyError}`);
+      throw new ValidationError(`Invalid sweet ID: ${prettyError}`);
     }
     return this.repository.getById(id);
   }
+
   createSweet(sweet: Sweet): Sweet {
     if (!sweet) {
-      throw new Error("Sweet cannot be null or undefined");
+      logger.error(`Sweet cannot be null or undefined`);
+      throw new ValidationError(`Sweet cannot be null or undefined`);
     }
     const existingSweet = this.repository.getById(sweet.id);
 
     if (existingSweet) {
-      throw new Error(`Sweet with ID ${sweet.id} already exists`);
+      logger.error(`Sweet with ID ${sweet.id} already exists`);
+      throw new ValidationError(`Sweet with ID ${sweet.id} already exists`);
     }
 
     return this.repository.create(sweet);
@@ -38,60 +43,67 @@ export class SweetService {
     const { success, error } = positiveIntegerSchema.safeParse(id);
     if (!success) {
       const prettyError = prettifyError(error);
-
-      throw new Error(prettyError);
+      logger.error(`Invalid sweet ID: ${prettyError}`);
+      throw new ValidationError(`Invalid sweet ID: ${prettyError}`);
     }
     return this.repository.delete(id);
   }
+
   searchSweets(criteria: SearchCriteria): Sweet[] {
     const { success, error } = searchCriteriaSchema.safeParse(criteria);
     if (!success) {
       const prettyError = prettifyError(error);
-
-      throw new Error(prettyError);
+      logger.error(`Invalid search criteria: ${prettyError}`);
+      throw new ValidationError(`Invalid search criteria: ${prettyError}`);
     }
 
     return this.repository.search(criteria);
   }
+
   purchaseSweet(id: number, quantity: number): boolean {
     const idValidation = positiveIntegerSchema.safeParse(id);
     if (!idValidation.success) {
       const prettyError = prettifyError(idValidation.error);
-
-      throw new Error(prettyError);
+      logger.error(`Invalid sweet ID: ${prettyError}`);
+      throw new ValidationError(`Invalid sweet ID: ${prettyError}`);
     }
 
     const quantityValidation = positiveIntegerSchema.safeParse(quantity);
     if (!quantityValidation.success) {
       const prettyError = prettifyError(quantityValidation.error);
-
-      throw new Error(prettyError);
+      logger.error(`Invalid quantity: ${prettyError}`);
+      throw new ValidationError(`Invalid quantity: ${prettyError}`);
     }
 
     const result = this.repository.purchase(id, quantity);
     if (!result) {
-      throw new Error("Purchase failed: Not enough stock or sweet not found");
+      throw new ValidationError(
+        "Purchase failed: Not enough stock or sweet not found",
+      );
     }
     return result;
   }
+
   restockSweet(id: number, quantity: number): boolean {
     const idValidation = positiveIntegerSchema.safeParse(id);
     if (!idValidation.success) {
       const prettyError = prettifyError(idValidation.error);
-
-      throw new Error(prettyError);
+      logger.error(`Invalid sweet ID: ${prettyError}`);
+      throw new ValidationError(`Invalid sweet ID: ${prettyError}`);
     }
 
     const quantityValidation = positiveIntegerSchema.safeParse(quantity);
     if (!quantityValidation.success) {
       const prettyError = prettifyError(quantityValidation.error);
-
-      throw new Error(prettyError);
+      logger.error(`Invalid quantity: ${prettyError}`);
+      throw new ValidationError(`Invalid quantity: ${prettyError}`);
     }
 
     const result = this.repository.restock(id, quantity);
     if (!result) {
-      throw new Error("Restock failed: Sweet not found or invalid quantity");
+      throw new ValidationError(
+        "Restock failed: Sweet not found or invalid quantity",
+      );
     }
     return result;
   }

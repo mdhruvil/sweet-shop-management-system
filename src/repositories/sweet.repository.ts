@@ -1,3 +1,4 @@
+import { NotFoundError } from "../errors/sweet.errors.js";
 import type { Sweet } from "../models/sweet.model.js";
 import type { SearchCriteria } from "../types/sweet.js";
 
@@ -24,7 +25,7 @@ export class InMemorySweetRepository implements ISweetRepository {
 
   create(sweet: Sweet): Sweet {
     if (!sweet) {
-      throw new Error("Sweet cannot be null or undefined");
+      throw new NotFoundError("Sweet cannot be null or undefined");
     }
 
     this.sweets.push(sweet);
