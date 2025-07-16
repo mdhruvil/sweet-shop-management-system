@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Sweet } from "../src/models/sweet.model.js";
+import { Sweet } from "../../src/models/sweet.model.js";
 
 describe("Sweet Model", () => {
   describe("Data Structure and Properties", () => {
