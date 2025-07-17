@@ -360,6 +360,17 @@ describe("SweetRepository", () => {
         expect(sweet?.price).toBe(3.0);
         expect(sweet?.quantity).toBe(15);
       });
+
+      it("should throw error when trying to update non-existent sweet", () => {
+        const nonExistentSweet = new Sweet(
+          999,
+          "Non-existent",
+          "chocolate",
+          2.5,
+          10,
+        );
+        expect(() => repository.update(nonExistentSweet)).toThrow();
+      });
     });
   });
 });

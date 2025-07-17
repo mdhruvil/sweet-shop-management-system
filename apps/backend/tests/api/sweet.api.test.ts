@@ -199,6 +199,14 @@ describe("Sweet Shop API Integration Tests", () => {
       expectErrorResponse(response, 404);
     });
 
+    it("should handle service returning null for purchase", async () => {
+      const response = await request(app)
+        .post("/api/sweets/999999/purchase")
+        .send(purchaseData);
+
+      expectErrorResponse(response, 404);
+    });
+
     it("should reject purchase without quantity field", async () => {
       const sweets = await setupTestData();
 
@@ -228,6 +236,14 @@ describe("Sweet Shop API Integration Tests", () => {
     it("should return 404 for non-existent sweet", async () => {
       const response = await request(app)
         .post("/api/sweets/999/restock")
+        .send(restockData);
+
+      expectErrorResponse(response, 404);
+    });
+
+    it("should handle service returning null for restock", async () => {
+      const response = await request(app)
+        .post("/api/sweets/999999/restock")
         .send(restockData);
 
       expectErrorResponse(response, 404);

@@ -186,6 +186,21 @@ describe("Sweet Model", () => {
       expect(() => sweet.purchase(15)).toThrow();
     });
 
+    it("should throw error when purchasing with invalid amount - zero", () => {
+      const sweet = new Sweet(1, "Chocolate Bar", "chocolate", 2.99, 10);
+      expect(() => sweet.purchase(0)).toThrow();
+    });
+
+    it("should throw error when purchasing with invalid amount - negative", () => {
+      const sweet = new Sweet(1, "Chocolate Bar", "chocolate", 2.99, 10);
+      expect(() => sweet.purchase(-1)).toThrow();
+    });
+
+    it("should throw error when purchasing with invalid amount - decimal", () => {
+      const sweet = new Sweet(1, "Chocolate Bar", "chocolate", 2.99, 10);
+      expect(() => sweet.purchase(2.5)).toThrow();
+    });
+
     it("should handle purchasing all remaining stock", () => {
       const sweet = new Sweet(2, "Final Stock", "pastry", 4.0, 5);
 
