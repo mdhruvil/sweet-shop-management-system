@@ -29,7 +29,7 @@ export class SweetService {
       logger.error(`Sweet cannot be null or undefined`);
       throw new ValidationError(`Sweet cannot be null or undefined`);
     }
-    const existingSweet = this.repository.getById(sweet.id);
+    const existingSweet = this.repository.exists(sweet.id);
 
     if (existingSweet) {
       logger.error(`Sweet with ID ${sweet.id} already exists`);
@@ -60,7 +60,7 @@ export class SweetService {
     return this.repository.search(criteria);
   }
 
-  purchaseSweet(id: number, quantity: number): boolean {
+  purchaseSweet(id: number, quantity: number): Sweet | undefined {
     const idValidation = positiveIntegerSchema.safeParse(id);
     if (!idValidation.success) {
       const prettyError = prettifyError(idValidation.error);
@@ -81,10 +81,11 @@ export class SweetService {
         "Purchase failed: Not enough stock or sweet not found",
       );
     }
-    return result;
+    const sweet = this.getSweetById(id);
+    return sweet;
   }
 
-  restockSweet(id: number, quantity: number): boolean {
+  restockSweet(id: number, quantity: number): Sweet | undefined {
     const idValidation = positiveIntegerSchema.safeParse(id);
     if (!idValidation.success) {
       const prettyError = prettifyError(idValidation.error);
@@ -105,6 +106,7 @@ export class SweetService {
         "Restock failed: Sweet not found or invalid quantity",
       );
     }
-    return result;
+    const sweet = this.getSweetById(id);
+    return sweet;
   }
 }

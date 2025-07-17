@@ -1,4 +1,4 @@
-import { NotFoundError } from "../errors/sweet.errors.js";
+import { NotFoundError, ValidationError } from "../errors/sweet.errors.js";
 import type { Sweet } from "../models/sweet.model.js";
 import type { SearchCriteria } from "../types/sweet.js";
 
@@ -10,6 +10,7 @@ export interface ISweetRepository {
   getById(id: number): Sweet | undefined;
   delete(id: number): boolean;
   search(criteria: SearchCriteria): Sweet[];
+  exists(id: number): boolean;
 
   update(sweet: Sweet): boolean;
   purchase(id: number, quantity: number): boolean;
@@ -37,13 +38,21 @@ export class InMemorySweetRepository implements ISweetRepository {
   }
 
   getById(id: number): Sweet | undefined {
-    return this.sweets.find((sweet) => sweet.id === id);
+    const sweet = this.sweets.find((sweet) => sweet.id === id);
+    if (!sweet) {
+      throw new NotFoundError(`Sweet with id ${id} not found`);
+    }
+    return sweet;
+  }
+
+  exists(id: number): boolean {
+    return this.sweets.some((sweet) => sweet.id === id);
   }
 
   delete(id: number): boolean {
     const index = this.sweets.findIndex((sweet) => sweet.id === id);
     if (index === -1) {
-      return false; // Sweet not found
+      throw new NotFoundError(`Sweet not found`);
     }
 
     this.sweets.splice(index, 1);
@@ -77,7 +86,7 @@ export class InMemorySweetRepository implements ISweetRepository {
   update(sweet: Sweet): boolean {
     const index = this.sweets.findIndex((s) => s.id === sweet.id);
     if (index === -1) {
-      return false; // Sweet not found
+      throw new NotFoundError(`Sweet not found`);
     }
 
     this.sweets[index] = sweet;
@@ -86,9 +95,12 @@ export class InMemorySweetRepository implements ISweetRepository {
 
   purchase(id: number, quantity: number): boolean {
     const sweet = this.getById(id);
+    if (!sweet) {
+      throw new NotFoundError(`Sweet not found`);
+    }
 
-    if (!sweet?.canPurchase(quantity)) {
-      return false; // Not enough stock or sweet not found
+    if (!sweet.canPurchase(quantity)) {
+      throw new ValidationError("Insufficient quantity for purchase");
     }
 
     sweet.purchase(quantity);
@@ -98,7 +110,7 @@ export class InMemorySweetRepository implements ISweetRepository {
   restock(id: number, quantity: number): boolean {
     const sweet = this.getById(id);
     if (!sweet) {
-      return false;
+      throw new NotFoundError(`Sweet not found`);
     }
     sweet.restock(quantity);
     return this.update(sweet);
