@@ -32,8 +32,8 @@ export type Sweet = z.infer<typeof sweetSchema>;
 
 export const searchCriteriaSchema = z
   .object({
-    name: nonEmptyStringSchema.optional(),
-    category: nonEmptyStringSchema.optional(),
+    name: z.string().optional(),
+    category: z.string().optional(),
     minPrice: nonNegativeNumberSchema.optional(),
     maxPrice: nonNegativeNumberSchema.optional(),
   })
@@ -52,16 +52,36 @@ export const searchCriteriaSchema = z
   .refine(
     (data) => {
       return (
-        data.name ||
-        data.category ||
-        (data.minPrice !== undefined && data.minPrice >= 0) ||
-        (data.maxPrice !== undefined && data.maxPrice >= 0)
+        (data.name && data.name.trim().length > 0) ||
+        (data.category && data.category.trim().length > 0) ||
+        data.minPrice !== undefined ||
+        data.maxPrice !== undefined
       );
     },
     {
-      message: "At least one valid search criteria is required",
-      path: ["name", "category", "minPrice", "maxPrice"],
+      message: "At least one search criteria is required",
+      path: ["name"],
     },
   );
-
 export type SearchCriteria = z.infer<typeof searchCriteriaSchema>;
+
+export const purchaseQuantitySchema = z.object({
+  quantity: positiveIntegerSchema,
+});
+
+export type PurchaseQuantity = z.infer<typeof purchaseQuantitySchema>;
+
+export const restockQuantitySchema = z.object({
+  quantity: positiveIntegerSchema,
+});
+
+export type RestockQuantity = z.infer<typeof restockQuantitySchema>;
+
+export const createSweetSchema = z.object({
+  name: nonEmptyStringSchema,
+  category: nonEmptyStringSchema,
+  price: nonNegativeNumberSchema,
+  quantity: nonNegativeIntegerSchema,
+});
+
+export type CreateSweet = z.infer<typeof createSweetSchema>;

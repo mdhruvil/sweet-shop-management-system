@@ -19,13 +19,20 @@ class ApiClient {
       },
     });
     if (!response.ok) {
-      const errorText = (await response.json()).error.catch(
-        () => "Unknown error!",
-      );
-
+      let errorText = "Unknown error!";
+      try {
+        const errorResponse = await response.json();
+        errorText =
+          errorResponse.error ||
+          errorResponse.message ||
+          `HTTP ${response.status}`;
+      } catch {
+        errorText = `HTTP ${response.status}: ${response.statusText}`;
+      }
       throw new Error(errorText);
     }
-    return response.json();
+    const { data } = await response.json();
+    return data as T;
   }
 
   getSweets(): Promise<Sweet[]> {
@@ -68,6 +75,19 @@ class ApiClient {
       method: "POST",
       body: JSON.stringify({ quantity }),
     });
+  }
+
+  async createMultipleSweets(sweets: Omit<Sweet, "id">[]): Promise<Sweet[]> {
+    const results: Sweet[] = [];
+    for (const sweet of sweets) {
+      try {
+        const result = await this.createSweet(sweet);
+        results.push(result);
+      } catch (error) {
+        console.error(`Failed to create sweet ${sweet.name}:`, error);
+      }
+    }
+    return results;
   }
 }
 
