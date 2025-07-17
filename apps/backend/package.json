@@ -1,0 +1,47 @@
+{
+  "name": "@sweet-shop/backend",
+  "version": "1.0.0",
+  "description": "Sweet Shop Management System - Backend API",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "node src/index.ts",
+    "dev": "npx tsx --watch src/index.ts",
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "api",
+    "sweet-shop",
+    "management"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.31.0",
+    "@eslint/markdown": "^7.0.0",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.14",
+    "@types/supertest": "^6.0.3",
+    "@vitest/coverage-v8": "3.2.4",
+    "@vitest/ui": "3.2.4",
+    "eslint": "^9.31.0",
+    "eslint-config-prettier": "^10.1.5",
+    "globals": "^16.3.0",
+    "supertest": "^7.1.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.37.0",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "winston": "^3.17.0",
+    "zod": "^4.0.5"
+  }
+}

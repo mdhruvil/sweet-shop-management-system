@@ -18,12 +18,11 @@
     "sourceMap": true,
     /* If your code doesn't run in the DOM: */
     "lib": ["es2022"],
-    "outDir": "./dist"
+    "outDir": "./dist",
+
+    // vitest globals to make it like jest
+    "types": ["vitest/globals"]
   },
-  "include": [],
-  "exclude": ["node_modules", "dist", "**/*.config.js", "**/*.config.ts"],
-  "references": [
-    { "path": "./apps/backend" },
-    { "path": "./apps/frontend" }
-  ]
+  "include": ["src/**/*", "*.ts", "tests/**/*.test.ts"],
+  "exclude": ["node_modules", "dist", "**/*.config.js", "**/*.config.ts"]
 }
