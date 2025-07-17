@@ -231,17 +231,15 @@ describe("SweetService", () => {
 
       it("should successfully purchase sweet when sufficient stock is available", () => {
         const result = service.purchaseSweet(1, 3);
-
-        expect(result).toBe(true);
         const sweet = service.getSweetById(1);
+        expect(result).toBe(sweet);
         expect(sweet?.quantity).toBe(7);
       });
 
       it("should purchase exact remaining stock", () => {
         const result = service.purchaseSweet(1, 10);
-
-        expect(result).toBe(true);
         const sweet = service.getSweetById(1);
+        expect(result).toBe(sweet);
         expect(sweet?.quantity).toBe(0);
       });
 
@@ -312,17 +310,16 @@ describe("SweetService", () => {
 
       it("should successfully restock sweet with valid quantity", () => {
         const result = service.restockSweet(1, 15);
-
-        expect(result).toBe(true);
         const sweet = service.getSweetById(1);
+        expect(result).toBe(sweet);
         expect(sweet?.quantity).toBe(25);
       });
 
       it("should restock out-of-stock sweet", () => {
         const result = service.restockSweet(2, 10);
 
-        expect(result).toBe(true);
         const sweet = service.getSweetById(2);
+        expect(result).toBe(sweet);
         expect(sweet?.quantity).toBe(10);
       });
 

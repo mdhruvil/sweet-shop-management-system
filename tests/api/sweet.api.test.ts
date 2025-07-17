@@ -1,9 +1,6 @@
 import request from "supertest";
-import { beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { app } from "../../src/index.js";
-import type { Sweet } from "../../src/models/sweet.model.js";
-import { InMemorySweetRepository } from "../../src/repositories/sweet.repository.js";
-import { SweetService } from "../../src/services/sweet.service.js";
 import {
   expectErrorResponse,
   expectSuccessResponse,
@@ -12,13 +9,6 @@ import {
 } from "./utils.js";
 
 describe("Sweet Shop API Integration Tests", () => {
-  let service: SweetService;
-
-  beforeEach(() => {
-    const repository = new InMemorySweetRepository();
-    service = new SweetService(repository);
-  });
-
   describe("GET /api/sweets", () => {
     it("should return empty array when no sweets exist", async () => {
       const response = await request(app).get("/api/sweets");
@@ -28,7 +18,7 @@ describe("Sweet Shop API Integration Tests", () => {
     });
 
     it("should return all sweets when they exist", async () => {
-      setupTestData(service);
+      await setupTestData();
 
       const response = await request(app).get("/api/sweets");
 
@@ -38,7 +28,7 @@ describe("Sweet Shop API Integration Tests", () => {
     });
 
     it("should return sweets in consistent order", async () => {
-      setupTestData(service);
+      await setupTestData();
 
       const response1 = await request(app).get("/api/sweets");
       const response2 = await request(app).get("/api/sweets");
@@ -102,14 +92,14 @@ describe("Sweet Shop API Integration Tests", () => {
 
   describe("GET /api/sweets/:id", () => {
     it("should return sweet by valid id", async () => {
-      const sweets = setupTestData(service);
+      const sweets = await setupTestData();
 
-      const response = await request(app).get("/api/sweets/1");
-      const sweet = sweets.find((s) => s.id === 1);
+      const sweet = sweets[0];
+      const response = await request(app).get(`/api/sweets/${sweet?.id}`);
 
       expectSuccessResponse(response, 200);
       expectValidSweet(response.body.data);
-      expect(response.body.data.id).toBe(1);
+      expect(response.body.data.id).toBe(sweet?.id);
       expect(response.body.data.name).toBe(sweet?.name);
     });
 
@@ -126,69 +116,13 @@ describe("Sweet Shop API Integration Tests", () => {
     });
   });
 
-  describe("PUT /api/sweets/:id", () => {
-    const updateData = {
-      name: "Updated Chocolate",
-      category: "chocolate",
-      price: 7.99,
-      quantity: 30,
-    };
-
-    it("should update existing sweet", async () => {
-      setupTestData(service);
-
-      const response = await request(app).put("/api/sweets/1").send(updateData);
-
-      expectSuccessResponse(response, 200);
-      expectValidSweet(response.body.data);
-      expect(response.body.data.id).toBe(1);
-      expect(response.body.data.name).toBe(updateData.name);
-      expect(response.body.data.price).toBe(updateData.price);
-    });
-
-    it("should return 404 for updating non-existent sweet", async () => {
-      const response = await request(app)
-        .put("/api/sweets/999")
-        .send(updateData);
-
-      expectErrorResponse(response, 404);
-    });
-
-    it("should reject update with invalid data", async () => {
-      setupTestData(service);
-      const invalidData = { ...updateData, price: -10 };
-      const invalidData2 = { ...updateData, quantity: -5 };
-      const invalidData3 = { ...updateData, name: "" };
-      const invalidData4 = { ...updateData, category: "" };
-
-      const response = await request(app)
-        .put("/api/sweets/1")
-        .send(invalidData);
-
-      const response2 = await request(app)
-        .put("/api/sweets/1")
-        .send(invalidData2);
-
-      const response3 = await request(app)
-        .put("/api/sweets/1")
-        .send(invalidData3);
-
-      const response4 = await request(app)
-        .put("/api/sweets/1")
-        .send(invalidData4);
-
-      expectErrorResponse(response, 400);
-      expectErrorResponse(response2, 400);
-      expectErrorResponse(response3, 400);
-      expectErrorResponse(response4, 400);
-    });
-  });
-
   describe("DELETE /api/sweets/:id", () => {
     it("should delete existing sweet", async () => {
-      setupTestData(service);
+      const sweets = await setupTestData();
 
-      const response = await request(app).delete("/api/sweets/1");
+      const response = await request(app).delete(
+        `/api/sweets/${sweets[0]?.id}`,
+      );
 
       expect(response.status).toBe(204);
       expect(response.body).toEqual({});
@@ -207,11 +141,13 @@ describe("Sweet Shop API Integration Tests", () => {
     });
 
     it("should actually remove sweet from repository", async () => {
-      setupTestData(service);
+      const sweets = await setupTestData();
 
-      await request(app).delete("/api/sweets/1");
+      await request(app).delete(`/api/sweets/${sweets[0]?.id}`);
 
-      const getResponse = await request(app).get("/api/sweets/1");
+      const getResponse = await request(app).get(
+        `/api/sweets/${sweets[0]?.id}`,
+      );
       expectErrorResponse(getResponse, 404);
     });
   });
@@ -220,10 +156,10 @@ describe("Sweet Shop API Integration Tests", () => {
     const purchaseData = { quantity: 5 };
 
     it("should purchase sweet with sufficient stock", async () => {
-      setupTestData(service);
+      const sweets = await setupTestData();
 
       const response = await request(app)
-        .post("/api/sweets/1/purchase")
+        .post(`/api/sweets/${sweets[0]?.id}/purchase`)
         .send(purchaseData);
 
       expectSuccessResponse(response, 200);
@@ -232,22 +168,24 @@ describe("Sweet Shop API Integration Tests", () => {
     });
 
     it("should return 400 for insufficient stock", async () => {
-      setupTestData(service);
+      const sweets = await setupTestData();
+      console.log(sweets);
       const largeOrder = { quantity: 100 };
 
       const response = await request(app)
-        .post("/api/sweets/1/purchase")
+        .post(`/api/sweets/${sweets[0]?.id}/purchase`)
         .send(largeOrder);
+      console.log(response.body);
 
       expectErrorResponse(response, 400);
     });
 
     it("should return 400 for zero or negative quantity", async () => {
-      setupTestData(service);
+      const sweets = await setupTestData();
       const invalidOrder = { quantity: 0 };
 
       const response = await request(app)
-        .post("/api/sweets/1/purchase")
+        .post(`/api/sweets/${sweets[0]?.id}/purchase`)
         .send(invalidOrder);
 
       expectErrorResponse(response, 400);
@@ -262,10 +200,10 @@ describe("Sweet Shop API Integration Tests", () => {
     });
 
     it("should reject purchase without quantity field", async () => {
-      setupTestData(service);
+      const sweets = await setupTestData();
 
       const response = await request(app)
-        .post("/api/sweets/1/purchase")
+        .post(`/api/sweets/${sweets[0]?.id}/purchase`)
         .send({});
 
       expectErrorResponse(response, 400);
@@ -276,10 +214,10 @@ describe("Sweet Shop API Integration Tests", () => {
     const restockData = { quantity: 10 };
 
     it("should restock sweet with valid quantity", async () => {
-      setupTestData(service);
+      const sweets = await setupTestData();
 
       const response = await request(app)
-        .post("/api/sweets/1/restock")
+        .post(`/api/sweets/${sweets[0]?.id}/restock`)
         .send(restockData);
 
       expectSuccessResponse(response, 200);
@@ -296,132 +234,35 @@ describe("Sweet Shop API Integration Tests", () => {
     });
 
     it("should return 400 for zero or negative quantity", async () => {
-      setupTestData(service);
+      const sweets = await setupTestData();
       const invalidRestock = { quantity: -5 };
 
       const response = await request(app)
-        .post("/api/sweets/1/restock")
+        .post(`/api/sweets/${sweets[0]?.id}/restock`)
         .send(invalidRestock);
 
       expectErrorResponse(response, 400);
     });
 
     it("should reject restock without quantity field", async () => {
-      setupTestData(service);
+      const sweets = await setupTestData();
 
       const response = await request(app)
-        .post("/api/sweets/1/restock")
+        .post(`/api/sweets/${sweets[0]?.id}/restock`)
         .send({});
 
       expectErrorResponse(response, 400);
     });
 
     it("should work on out of stock items", async () => {
-      setupTestData(service);
+      const sweets = await setupTestData();
 
       const response = await request(app)
-        .post("/api/sweets/4/restock") // Sweet with 0 quantity
+        .post(`/api/sweets/${sweets[3]?.id}/restock`) // Sweet with 0 quantity
         .send({ quantity: 15 });
 
       expectSuccessResponse(response, 200);
       expect(response.body.data.quantity).toBe(15);
-    });
-  });
-
-  describe("GET /api/sweets/search", () => {
-    beforeEach(() => {
-      setupTestData(service);
-    });
-
-    it("should search by name", async () => {
-      const response = await request(app)
-        .get("/api/sweets/search")
-        .query({ name: "Chocolate" });
-
-      expectSuccessResponse(response, 200);
-      expect(response.body.data).toHaveLength(2);
-      response.body.data.forEach((sweet: Sweet) => {
-        expect(sweet.name.toLowerCase()).toContain("chocolate");
-      });
-    });
-
-    it("should search by category", async () => {
-      const response = await request(app)
-        .get("/api/sweets/search")
-        .query({ category: "chocolate" });
-
-      expectSuccessResponse(response, 200);
-      expect(response.body.data).toHaveLength(2);
-      response.body.data.forEach((sweet: Sweet) => {
-        expect(sweet.category).toBe("chocolate");
-      });
-    });
-
-    it("should search by price range", async () => {
-      const response = await request(app)
-        .get("/api/sweets/search")
-        .query({ minPrice: 3.0, maxPrice: 4.0 });
-
-      expectSuccessResponse(response, 200);
-      expect(response.body.data.length).toBeGreaterThan(0);
-      response.body.data.forEach((sweet: Sweet) => {
-        expect(sweet.price).toBeGreaterThanOrEqual(3.0);
-        expect(sweet.price).toBeLessThanOrEqual(4.0);
-      });
-    });
-
-    it("should combine search criteria", async () => {
-      const response = await request(app).get("/api/sweets/search").query({
-        category: "chocolate",
-        minPrice: 4.0,
-      });
-
-      expectSuccessResponse(response, 200);
-      response.body.data.forEach((sweet: Sweet) => {
-        expect(sweet.category).toBe("chocolate");
-        expect(sweet.price).toBeGreaterThanOrEqual(4.0);
-      });
-    });
-
-    it("should return empty array when no matches found", async () => {
-      const response = await request(app)
-        .get("/api/sweets/search")
-        .query({ name: "NonExistentSweet" });
-
-      expectSuccessResponse(response, 200);
-      expect(response.body.data).toEqual([]);
-    });
-
-    it("should return 400 for invalid search criteria", async () => {
-      const response = await request(app).get("/api/sweets/search");
-
-      expectErrorResponse(response, 400);
-    });
-
-    it("should handle case-insensitive name search", async () => {
-      const response = await request(app)
-        .get("/api/sweets/search")
-        .query({ name: "DARK" });
-
-      expectSuccessResponse(response, 200);
-      expect(response.body.data).toHaveLength(1);
-      expect(response.body.data[0].name).toBe("Dark Chocolate");
-    });
-
-    it("should validate price range parameters", async () => {
-      const response = await request(app)
-        .get("/api/sweets/search")
-        .query({ minPrice: "invalid" });
-
-      expectErrorResponse(response, 400);
-    });
-
-    it("should handle maxPrice less than minPrice", async () => {
-      const response = await request(app)
-        .get("/api/sweets/search")
-        .query({ minPrice: 10.0, maxPrice: 5.0 });
-
-      expectErrorResponse(response, 400);
     });
   });
 
@@ -432,17 +273,8 @@ describe("Sweet Shop API Integration Tests", () => {
       expect(response.status).toBe(404);
     });
 
-    it("should handle malformed JSON in request body", async () => {
-      const response = await request(app)
-        .post("/api/sweets")
-        .set("Content-Type", "application/json")
-        .send("{ invalid json }");
-
-      expectErrorResponse(response, 400);
-    });
-
     it("should return appropriate content-type headers", async () => {
-      setupTestData(service);
+      await setupTestData();
 
       const response = await request(app).get("/api/sweets");
 

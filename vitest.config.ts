@@ -8,5 +8,11 @@ export default defineConfig({
       reporter: ["json-summary", "text"],
       reportOnFailure: true,
     },
+    pool: "forks",
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
   },
 });
