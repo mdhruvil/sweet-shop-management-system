@@ -23,4 +23,11 @@ export default defineConfig([
     extends: ["markdown/recommended"],
   },
   eslintConfigPrettier,
+  {
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: __dirname,
+      },
+    },
+  },
 ]);

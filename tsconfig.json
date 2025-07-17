@@ -22,8 +22,5 @@
   },
   "include": [],
   "exclude": ["node_modules", "dist", "**/*.config.js", "**/*.config.ts"],
-  "references": [
-    { "path": "./apps/backend" },
-    { "path": "./apps/frontend" }
-  ]
+  "references": [{ "path": "./apps/backend" }, { "path": "./apps/frontend" }]
 }
