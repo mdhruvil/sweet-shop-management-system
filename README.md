@@ -93,6 +93,25 @@ The development server will start:
 
 ![Coverage Report Image](./test-report.png)
 
+## Screenshots
+
+Below are some screenshots of the Sweet Shop Management System UI:
+
+<table width="100%">
+  <tr>
+    <td width="50%"><img src="./screenshots/empty-inventory-state.png" alt="Empty Inventory State" width="100%"/><br><b>Empty Inventory State</b></td>
+    <td width="50%"><img src="./screenshots/all-sweets-list.png" alt="All Sweets List" width="100%"/><br><b>All Sweets List</b></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="./screenshots/search-cupcake-results.png" alt="Search Cupcake Results" width="100%"/><br><b>Search Cupcake Results</b></td>
+    <td width="50%"><img src="./screenshots/purchase-dialog-error.png" alt="Purchase Dialog Error" width="100%"/><br><b>Purchase Dialog Error</b></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="./screenshots/restock-dialog.png" alt="Restock Dialog" width="100%"/><br><b>Restock Dialog</b></td>
+    <td width="50%"></td>
+  </tr>
+</table>
+
 ## Development
 
 This project follows TDD principles. Write tests first, then implement functionality.
