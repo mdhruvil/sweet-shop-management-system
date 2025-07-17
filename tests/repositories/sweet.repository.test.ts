@@ -31,8 +31,7 @@ describe("SweetRepository", () => {
 
   describe("getById", () => {
     it("should return undefined when sweet don't exist", () => {
-      const sweet = repository.getById(1);
-      expect(sweet).toBeUndefined();
+      expect(() => repository.getById(1)).toThrow();
     });
 
     it("should return the sweet when it exists", () => {
@@ -51,6 +50,20 @@ describe("SweetRepository", () => {
 
       const foundSweet3 = repository.getById(3);
       expect(foundSweet3).toEqual(sweet3);
+    });
+  });
+
+  describe("exists", () => {
+    it("should return false when sweet doesn't exist", () => {
+      expect(() => repository.exists(1)).toBe(false);
+      expect(() => repository.exists(999)).toBe(false);
+    });
+    it("should return true when sweet exists", () => {
+      const sweet = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);
+      repository.create(sweet);
+
+      const exists = repository.exists(1);
+      expect(exists).toBe(true);
     });
   });
 
@@ -87,8 +100,7 @@ describe("SweetRepository", () => {
 
   describe("delete", () => {
     it("should return false when trying to delete non-existent sweet", () => {
-      const result = repository.delete(999);
-      expect(result).toBe(false);
+      expect(() => repository.delete(999)).toThrow();
     });
 
     it("should delete existing sweet and return true", () => {
@@ -98,8 +110,7 @@ describe("SweetRepository", () => {
       const result = repository.delete(1);
       expect(result).toBe(true);
 
-      const foundSweet = repository.getById(1);
-      expect(foundSweet).toBeUndefined();
+      expect(() => repository.getById(1)).toThrow();
     });
 
     it("should only delete the specified sweet", () => {
@@ -261,13 +272,11 @@ describe("SweetRepository", () => {
       });
 
       it("should return false when sweet does not exist", () => {
-        const result = repository.purchase(999, 1);
-        expect(result).toBe(false);
+        expect(() => repository.purchase(999, 1)).toThrow();
       });
 
       it("should return false when insufficient stock available", () => {
-        const result = repository.purchase(1, 15);
-        expect(result).toBe(false);
+        expect(() => repository.purchase(1, 15)).toThrow();
 
         const sweet = repository.getById(1);
         expect(sweet?.quantity).toBe(10);
@@ -308,8 +317,7 @@ describe("SweetRepository", () => {
       });
 
       it("should return false when sweet does not exist", () => {
-        const result = repository.restock(999, 10);
-        expect(result).toBe(false);
+        expect(() => repository.restock(999, 10)).toThrow();
       });
 
       it("should maintain other sweet properties unchanged after restock", () => {
