@@ -91,4 +91,4 @@ class ApiClient {
   }
 }
 
-export const apiClient = new ApiClient("http://localhost:5173/api");
+export const apiClient = new ApiClient(window.location.origin + "/api");

@@ -1,0 +1,80 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm
+
+# Build outputs
+dist
+build
+.next
+.nuxt
+.vite
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Testing
+coverage
+.nyc_output
+
+# Cache directories
+.eslintcache
+.tscache
+
+# Temporary files
+*.tmp
+*.temp
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+.dockerignore
+docker-compose*
+
+# Documentation
+README.md
+*.md
+!package*.json
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Development tools
+.prettierrc*
+.prettierignore
+eslint.config.js
+tsconfig*.json
+vitest.config.ts
+vite.config.ts

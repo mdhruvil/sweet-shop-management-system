@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/api/client";
 import type { SearchCriteria, Sweet } from "@/schema/sweet";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const SWEET_QUERY_KEY = "sweets";
 

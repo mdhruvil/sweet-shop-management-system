@@ -1,6 +1,4 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { type CreateSweet, createSweetSchema } from "@/schema/sweet";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -18,8 +16,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useCreateSweet } from "@/hooks/use-sweet-api";
+import { type CreateSweet, createSweetSchema } from "@/schema/sweet";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 interface AddSweetDialogProps {
@@ -47,7 +47,9 @@ export function AddSweetDialog({ isOpen, onClose }: AddSweetDialogProps) {
       form.reset();
       onClose();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to add sweet");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to add sweet",
+      );
     }
   };
 
@@ -67,7 +69,7 @@ export function AddSweetDialog({ isOpen, onClose }: AddSweetDialogProps) {
             Enter the details for the new sweet to add to your inventory.
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -91,7 +93,10 @@ export function AddSweetDialog({ isOpen, onClose }: AddSweetDialogProps) {
                 <FormItem>
                   <FormLabel>Category</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Chocolate, Candy, Pastry" {...field} />
+                    <Input
+                      placeholder="e.g., Chocolate, Candy, Pastry"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -138,15 +143,12 @@ export function AddSweetDialog({ isOpen, onClose }: AddSweetDialogProps) {
                 </FormItem>
               )}
             />
-            
+
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
-                disabled={createMutation.isPending}
-              >
+              <Button type="submit" disabled={createMutation.isPending}>
                 {createMutation.isPending ? "Adding..." : "Add Sweet"}
               </Button>
             </DialogFooter>
