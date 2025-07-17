@@ -55,8 +55,8 @@ describe("SweetRepository", () => {
 
   describe("exists", () => {
     it("should return false when sweet doesn't exist", () => {
-      expect(() => repository.exists(1)).toBe(false);
-      expect(() => repository.exists(999)).toBe(false);
+      expect(repository.exists(1)).toBe(false);
+      expect(repository.exists(999)).toBe(false);
     });
     it("should return true when sweet exists", () => {
       const sweet = new Sweet(1, "Chocolate Bar", "chocolate", 2.5, 10);

@@ -75,8 +75,7 @@ describe("SweetService", () => {
 
   describe("delete", () => {
     it("should return false when trying to delete non-existent sweet", () => {
-      const result = service.deleteSweet(999);
-      expect(result).toBe(false);
+      expect(() => service.deleteSweet(999)).toThrow();
     });
 
     it("should delete existing sweet and return true", () => {
